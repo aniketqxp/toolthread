@@ -1,0 +1,22 @@
+# Base-model candidate B — SmolLM3 3B (instruct).
+# Verified live on Hugging Face (2026-06): "HuggingFaceTB/SmolLM3-3B" exists and
+# IS the instruct/chat model (the base is "HuggingFaceTB/SmolLM3-3B-Base").
+#
+# IMPORTANT: SmolLM3 is NOT in bfcl-eval 2026.3.23's SUPPORTED_MODELS registry.
+# BFCL selects prompt formatting by handler (each handler implements its own
+# _format_prompt), so before this model can be scored you must register a custom
+# SmolLM3 handler in BFCL. Until then the harness fails loudly (bfcl_supported:
+# false) rather than score it under a mismatched format. That custom handler then
+# becomes the prompt-parity anchor for any fine-tuned SmolLM3 run.
+
+hf_repo_id: HuggingFaceTB/SmolLM3-3B
+bfcl_model: null                     # set to the handler name once registered in BFCL
+bfcl_supported: false                # blocks eval until a handler exists (see note above)
+
+local_model_path: null
+
+# SmolLM3 is a hybrid-reasoning model; decide thinking vs non-thinking mode when
+# you register the handler (it affects tool-calling output and must be identical
+# for baseline and fine-tuned).
+num_gpus: 1
+gpu_memory_utilization: 0.9

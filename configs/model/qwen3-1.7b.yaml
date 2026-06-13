@@ -1,0 +1,25 @@
+# Base-model candidate A — Qwen3 1.7B (post-trained / instruct).
+# Verified live on Hugging Face (2026-06): the canonical post-trained id is
+# "Qwen/Qwen3-1.7B". There is NO "-Instruct" suffix at this size, and no dated
+# "-2507" variant for 1.7B; the base model is "Qwen/Qwen3-1.7B-Base".
+
+hf_repo_id: Qwen/Qwen3-1.7B          # off-the-shelf weights pulled from HF for the baseline
+
+# Prompt regime = FC (native function calling). Decision verified against live BFCL
+# docs (2026-06): BFCL defines "FC" as the native path for models that support tool
+# calling, and "Prompt" as the workaround for those that don't. Qwen3 supports native
+# tool calling, so its leaderboard-comparable row is the "-FC" handler. The handler
+# string is recorded in the run manifest as prompt_mode and MUST be reused identically
+# for any fine-tuned run, or the before/after comparison is invalid. To switch the
+# whole regime to prompt mode, change this to "Qwen/Qwen3-1.7B" (no suffix).
+bfcl_model: Qwen/Qwen3-1.7B-FC       # BFCL handler / --model value; DEFINES the prompt format
+bfcl_supported: true                 # present in bfcl-eval 2026.3.23 SUPPORTED_MODELS
+
+# Fine-tuned checkpoint (merged weights). null = off-the-shelf baseline.
+# When set, bfcl_model (the handler / prompt format) stays identical; only the
+# weights change via --local-model-path.
+local_model_path: null
+
+# vLLM/sglang serving knobs (1.7B in fp16 ~3 GB — fits a single 16 GB T4).
+num_gpus: 1
+gpu_memory_utilization: 0.9
