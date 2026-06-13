@@ -1,0 +1,23 @@
+# Toolthread — pinned environment for the BFCL eval harness (setup phase).
+#
+# Strategy (approved): exact pins for the standalone layer; the GPU serving
+# layer (torch / vllm|sglang / transformers / huggingface_hub) is installed via
+# the official bfcl-eval extra so vLLM dictates a compatible torch, then frozen
+# into a PER-PLATFORM requirements.lock.txt after the first clean GPU install.
+# numpy / pyarrow are intentionally left unpinned (platform base images own them).
+
+# ---- Stable layer: exact pins, platform-agnostic ----
+bfcl-eval==2026.3.23          # official BFCL scorer + CLI (PyPI; imports as bfcl_eval). Python >=3.10
+python-dotenv==1.0.1          # load .env -> os.environ (no hardcoded secrets)
+pyyaml==6.0.2                 # read configs/*.yaml
+wandb==0.19.1                 # log official BFCL scores
+
+# ---- GPU serving layer: DO NOT free-float. Install via the official extra. ----
+# vLLM (universal default — works on Kaggle 2x T4 / SM75 and everything newer):
+#     pip install "bfcl-eval[oss_eval_vllm,wandb]==2026.3.23"
+# sglang fast path (Lightning Ampere+ / SM80+ ONLY — L4, A10G, A100):
+#     pip install "bfcl-eval[oss_eval_sglang,wandb]==2026.3.23"
+#
+# transformers / torch / vllm|sglang / huggingface_hub are resolved by the extra
+# and captured into requirements.lock.txt (per platform). On Kaggle, do NOT
+# reinstall torch — keep the image's CUDA-matched build.

@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "toolthread"
+version = "0.0.1"
+description = "Fine-tuning a small LM for multi-turn tool-calling, benchmarked on BFCL."
+requires-python = ">=3.10"
+# Runtime dependencies are pinned in requirements.txt (single source of truth),
+# not here, so the GPU platforms install an environment locked per-platform.
+dependencies = []
+
+# src/ holds the importable code: the top-level module `config` and the `eval`
+# package. After `pip install -e .` (or via the sys.path bootstrap in
+# scripts/run_bfcl_eval.py) these import as `config` and `eval.*`.
+[tool.setuptools]
+package-dir = { "" = "src" }
+py-modules = ["config"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
