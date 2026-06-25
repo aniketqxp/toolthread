@@ -114,7 +114,7 @@ def main() -> None:
     device_info = "CPU"
     if torch.cuda.is_available():
         device_info = torch.cuda.get_device_name(0)
-        print(f"[train] GPU: {device_info}  VRAM: {torch.cuda.get_device_properties(0).total_mem / 1e9:.1f} GB")
+        print(f"[train] GPU: {device_info}  VRAM: {torch.cuda.get_device_properties(0).total_memory / 1e9:.1f} GB")
     else:
         print("[train] WARNING: no GPU detected — training will be very slow")
 
