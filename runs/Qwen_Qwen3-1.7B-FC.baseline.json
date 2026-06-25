@@ -1,0 +1,14 @@
+{
+  "model": "Qwen/Qwen3-1.7B",
+  "bfcl_model": "Qwen/Qwen3-1.7B-FC",
+  "prompt_mode": "fc",
+  "backend": "vllm",
+  "is_baseline": true,
+  "scores": {
+    "multi_turn_overall": 14.88,
+    "multi_turn_base": 20.0,
+    "multi_turn_miss_func": 13.0,
+    "multi_turn_miss_param": 14.0,
+    "multi_turn_long_context": 12.5
+  }
+}
