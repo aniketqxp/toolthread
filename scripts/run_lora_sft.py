@@ -126,7 +126,7 @@ def main() -> None:
 
     model = AutoModelForCausalLM.from_pretrained(
         model_id,
-        torch_dtype=torch.bfloat16 if use_bf16 else torch.float16,
+        dtype=torch.bfloat16 if use_bf16 else torch.float16,
         trust_remote_code=True,
     )
 
@@ -143,7 +143,8 @@ def main() -> None:
     )
 
     # --- SFT config ---
-    sft_config = SFTConfig(
+    import inspect
+    sft_config_kwargs = dict(
         output_dir=output_dir,
         num_train_epochs=num_epochs,
         per_device_train_batch_size=batch_size,
@@ -155,14 +156,17 @@ def main() -> None:
         gradient_checkpointing=grad_ckpt,
         bf16=use_bf16,
         fp16=(not use_bf16),
-        max_seq_length=max_seq_len,
-        packing=packing,
         logging_steps=logging_steps,
         save_steps=save_steps,
         save_total_limit=save_total_limit,
         report_to="none",
         remove_unused_columns=False,
     )
+    sft_init_params = set(inspect.signature(SFTConfig.__init__).parameters)
+    for key, val in [("max_seq_length", max_seq_len), ("packing", packing)]:
+        if key in sft_init_params:
+            sft_config_kwargs[key] = val
+    sft_config = SFTConfig(**sft_config_kwargs)
 
     print(f"[train] LoRA r={lora_rank} alpha={lora_alpha} targets={lora_target}")
     print(f"[train] epochs={num_epochs} batch={batch_size} grad_accum={grad_accum} "
@@ -170,13 +174,20 @@ def main() -> None:
     print(f"[train] output_dir={output_dir}")
 
     # --- train ---
-    trainer = SFTTrainer(
+    trainer_kwargs = dict(
         model=model,
         args=sft_config,
         train_dataset=train_ds,
-        processing_class=tokenizer,
         peft_config=lora_config,
     )
+    trainer_init_params = set(inspect.signature(SFTTrainer.__init__).parameters)
+    if "processing_class" in trainer_init_params:
+        trainer_kwargs["processing_class"] = tokenizer
+    else:
+        trainer_kwargs["tokenizer"] = tokenizer
+    if "max_seq_length" in trainer_init_params and "max_seq_length" not in sft_config_kwargs:
+        trainer_kwargs["max_seq_length"] = max_seq_len
+    trainer = SFTTrainer(**trainer_kwargs)
 
     trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
     total = sum(p.numel() for p in model.parameters())
