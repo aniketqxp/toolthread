@@ -122,8 +122,7 @@ def build_train_pipeline(train_args: argparse.Namespace) -> str:
 
     steps = _clone_and_setup() + [
         "pip install -q datasets peft trl accelerate huggingface_hub",
-        "pip install -q torchvision --upgrade --no-deps || true",
-        "python -c \"import torch; import torchvision; print(f'torch={torch.__version__} torchvision={torchvision.__version__}')\"",
+        "python -c \"import torch; print(f'torch={torch.__version__}')\"",
         "python scripts/prep_sft_data.py",
         train_cmd,
     ]
