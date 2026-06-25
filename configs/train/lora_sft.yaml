@@ -1,0 +1,36 @@
+# LoRA SFT config for Qwen3-1.7B on multi-turn function-calling data.
+# Used by scripts/run_lora_sft.py.  All values can be overridden via CLI.
+
+model_id: Qwen/Qwen3-1.7B
+
+# LoRA
+lora_rank: 16
+lora_alpha: 32
+lora_target_modules: [q_proj, v_proj, k_proj, o_proj]
+lora_dropout: 0.05
+
+# Training
+learning_rate: 2.0e-4
+num_epochs: 3
+per_device_batch_size: 4
+gradient_accumulation_steps: 4
+warmup_ratio: 0.03
+weight_decay: 0.01
+lr_scheduler_type: cosine
+gradient_checkpointing: true
+max_seq_length: 2048
+bf16: true
+
+# SFT-specific (TRL)
+assistant_only_loss: true
+packing: false
+
+# Output
+output_dir: checkpoints/qwen3-1.7b-lora
+logging_steps: 10
+save_steps: 500
+save_total_limit: 2
+
+# HF push (requires HF_TOKEN in env)
+push_to_hub: false
+hub_model_id: null

@@ -28,6 +28,9 @@ checkpoints/
 outputs/
 wandb/
 
+# Generated training data (from prep_sft_data.py)
+data/
+
 # BFCL generated responses + score files (BFCL_PROJECT_ROOT default)
 bfcl_runs/
 
