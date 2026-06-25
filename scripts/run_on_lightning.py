@@ -121,14 +121,11 @@ def build_train_pipeline(train_args: argparse.Namespace) -> str:
         train_cmd += f" --hub-model-id {train_args.hub_model_id}"
 
     steps = _clone_and_setup() + [
-        "pip install -q datasets peft trl accelerate bitsandbytes",
-        "pip install -q torch --upgrade || true",
+        "pip install -q datasets peft trl accelerate huggingface_hub",
         "python scripts/prep_sft_data.py",
         train_cmd,
     ]
 
-    if train_args.push_to_hub and train_args.hub_model_id:
-        steps.append(f"echo '[lightning] merged model pushed to {train_args.hub_model_id}'")
 
     return "\n".join(steps)
 

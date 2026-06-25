@@ -143,18 +143,12 @@ def main() -> None:
 
     if not args.skip_funreason:
         print("[prep] loading Bingguang/FunReason-MT ...", flush=True)
-        try:
-            fr_ds = load_dataset("Bingguang/FunReason-MT", split="train", token=hf_token)
-            print(f"[prep] FunReason-MT: {len(fr_ds)} raw rows, columns={fr_ds.column_names}")
-            fr_data = fr_ds
-        except Exception as exc:
-            print(f"[prep] load_dataset failed ({exc}), falling back to raw JSON download")
-            from huggingface_hub import hf_hub_download
-            path = hf_hub_download("Bingguang/FunReason-MT", "bfcl_multi_turn.json",
-                                   repo_type="dataset", token=hf_token)
-            with open(path, "r", encoding="utf-8") as f:
-                fr_data = json.load(f)
-            print(f"[prep] FunReason-MT: {len(fr_data)} raw conversations from JSON")
+        from huggingface_hub import hf_hub_download
+        path = hf_hub_download("Bingguang/FunReason-MT", "bfcl_multi_turn.json",
+                               repo_type="dataset", token=hf_token)
+        with open(path, "r", encoding="utf-8") as f:
+            fr_data = json.load(f)
+        print(f"[prep] FunReason-MT: {len(fr_data)} raw conversations from JSON")
         fr_samples = _convert_funreason(fr_data)
         print(f"[prep] FunReason-MT: {len(fr_samples)} converted samples")
         all_samples.extend(fr_samples)
