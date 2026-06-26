@@ -192,9 +192,20 @@ def main() -> None:
     trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
     total = sum(p.numel() for p in model.parameters())
     print(f"[train] trainable params: {trainable:,} / {total:,} ({100*trainable/total:.2f}%)")
-    print("[train] starting training ...", flush=True)
 
-    trainer.train()
+    # --- resume from checkpoint if available ---
+    resume_ckpt = None
+    ckpt_dir = Path(output_dir)
+    if ckpt_dir.exists():
+        ckpts = sorted(ckpt_dir.glob("checkpoint-*"), key=lambda p: int(p.name.split("-")[-1]))
+        if ckpts:
+            resume_ckpt = str(ckpts[-1])
+            print(f"[train] resuming from {resume_ckpt}", flush=True)
+
+    if resume_ckpt is None:
+        print("[train] starting training from scratch ...", flush=True)
+
+    trainer.train(resume_from_checkpoint=resume_ckpt)
     print("[train] training complete", flush=True)
 
     # --- save adapter ---
